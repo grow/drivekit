@@ -5,10 +5,15 @@ html = """
 """
 
 import bs4
+import cssutils
 import jinja2
 import re
 import tags
 import processors
+import logging
+
+
+cssutils.log.setLevel(logging.CRITICAL)
 
 
 def collect_processors():
@@ -51,8 +56,9 @@ def parse_google_html(html):
 def test(html):
     parsed_html = parse_google_html(html)
     soup = bs4.BeautifulSoup(parsed_html, 'html5lib')
+    stylesheet = cssutils.parseString(style_tag)
     for processor_class in collect_processors():
-        processor_instance = processor_class()
+        processor_instance = processor_class(stylesheet=stylesheet)
         processor_instance.process(soup)
     return soup
 
